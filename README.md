@@ -5,8 +5,8 @@ THIS GAME IS A CLICKER GAME WERE YOU CLICK A ROCKET TO KM(MONEY)
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-select=none">
-    <title>Rocket Clicker: Deep Space ULTIMATE (Responsive)</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rocket Clicker: Deep Space ULTIMATE</title>
     <style>
         :root {
             --space-bg: #020205;
@@ -16,20 +16,54 @@ THIS GAME IS A CLICKER GAME WERE YOU CLICK A ROCKET TO KM(MONEY)
             --panel-bg: rgba(255, 255, 255, 0.95);
         }
 
-        /* FIX 1: Allow scrolling on mobile but hide it on desktop */
         body {
             margin: 0;
-            min-height: 100vh;
+            height: 100vh;
             display: flex;
             background-color: var(--space-bg);
             font-family: 'Segoe UI', Arial, sans-serif;
+            overflow: hidden;
             color: #333;
             user-select: none;
-            overflow-x: hidden;
         }
 
+        /* --- LAUNCHER OVERLAY STYLES --- */
+        #launcher {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle at center, #0a0a20 0%, #020205 100%);
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            transition: opacity 0.5s;
+        }
+
+        .launch-icon {
+            font-size: 100px;
+            cursor: pointer;
+            transition: transform 0.3s, filter 0.3s;
+            filter: drop-shadow(0 0 20px var(--neon-blue));
+        }
+
+        .launch-icon:hover {
+            transform: scale(1.1) rotate(-10deg);
+            filter: drop-shadow(0 0 40px var(--neon-blue));
+        }
+
+        .launch-text {
+            margin-top: 20px;
+            font-weight: bold;
+            letter-spacing: 2px;
+            color: var(--neon-blue);
+            text-transform: uppercase;
+        }
+
+        /* --- GAME STYLES --- */
         #starfield {
-            position: fixed; /* Changed to fixed so it stays in background */
+            position: absolute;
             width: 100%;
             height: 100%;
             z-index: 1;
@@ -49,35 +83,30 @@ THIS GAME IS A CLICKER GAME WERE YOU CLICK A ROCKET TO KM(MONEY)
         }
 
         #fullscreen-btn {
-            position: fixed;
-            top: 10px;
-            right: 10px;
+            position: absolute;
+            top: 20px;
+            right: 20px;
             z-index: 1000;
             background: rgba(255, 255, 255, 0.2);
             border: 1px solid var(--neon-blue);
             color: white;
-            padding: 5px 10px;
+            padding: 8px 12px;
             border-radius: 8px;
             cursor: pointer;
-            font-size: 12px;
+            font-weight: bold;
             backdrop-filter: blur(5px);
         }
 
-        /* FIX 2: Sidebar becomes top-bar on small screens */
         .sidebar {
             width: 320px;
-            min-width: 320px;
             background: var(--panel-bg);
-            padding: 15px;
+            padding: 20px;
             display: flex;
             flex-direction: column;
             gap: 10px;
             z-index: 100;
             border-right: 5px solid var(--neon-blue);
             box-shadow: 5px 0 25px rgba(0,0,0,0.5);
-            height: 100vh;
-            box-sizing: border-box;
-            overflow-y: auto;
         }
 
         .stats {
@@ -89,7 +118,7 @@ THIS GAME IS A CLICKER GAME WERE YOU CLICK A ROCKET TO KM(MONEY)
         }
 
         .km-count {
-            font-size: clamp(24px, 5vw, 32px);
+            font-size: 32px;
             font-weight: 900;
             color: #ffffff; 
             text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
@@ -97,51 +126,36 @@ THIS GAME IS A CLICKER GAME WERE YOU CLICK A ROCKET TO KM(MONEY)
         }
 
         .tabs { display: flex; gap: 5px; margin-bottom: 5px; }
-        .tab-btn { flex: 1; padding: 8px 2px; font-size: 11px; font-weight: bold; cursor: pointer; border: none; border-radius: 5px; background: #ccc; }
+        .tab-btn { flex: 1; padding: 8px 2px; font-size: 11px; font-weight: bold; cursor: pointer; border: none; border-radius: 5px; background: #ccc; transition: 0.2s; }
         .tab-btn.active { background: var(--neon-blue); color: white; }
         
-        .tab-content { flex: 1; display: none; padding-right: 5px; }
+        .tab-content { flex: 1; overflow-y: auto; display: none; padding-right: 5px; }
         .tab-content.active { display: block; }
 
         .upgrade-item, .skin-item, .planet-item, .ach-item {
             background: #fff;
             border: 2px solid #ddd;
-            padding: 8px;
+            padding: 10px;
             border-radius: 12px;
             cursor: pointer;
+            transition: 0.1s;
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 8px;
-            font-size: 12px;
+            font-size: 13px;
         }
 
-        .disabled { opacity: 0.5 !important; cursor: not-allowed; filter: grayscale(1); }
+        .disabled { opacity: 0.5 !important; cursor: not-allowed; filter: grayscale(1); background: #eee !important; }
         .price-tag { background: var(--gold-bg); color: #000; padding: 3px 6px; border-radius: 6px; font-weight: 900; }
 
-        .game-area { flex: 1; display: flex; justify-content: center; align-items: center; z-index: 50; position: relative; min-height: 350px; }
-        
-        /* FIX 3: Rocket scales with screen width */
-        .rocket-container { 
-            position: relative; 
-            width: 80%; 
-            max-width: 300px; 
-            aspect-ratio: 1/1; 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-        }
-        
-        #rocket { 
-            font-size: clamp(80px, 20vw, 150px); 
-            cursor: pointer; 
-            transition: transform 0.05s; 
-            z-index: 10; 
-        }
+        .game-area { flex: 1; display: flex; justify-content: center; align-items: center; z-index: 50; position: relative; }
+        .rocket-container { position: relative; width: 300px; height: 300px; display: flex; justify-content: center; align-items: center; }
+        #rocket { font-size: 150px; cursor: pointer; transition: transform 0.05s; z-index: 10; }
         #rocket:active { transform: scale(0.85) translateY(-20px); }
 
         .satellite {
-            position: absolute; font-size: 25px; pointer-events: none;
+            position: absolute; font-size: 30px; pointer-events: none; left: 50%; top: 50%; margin-left: -20px; margin-top: -20px;
             animation: orbit var(--dur) linear infinite;
         }
         @keyframes orbit {
@@ -153,17 +167,15 @@ THIS GAME IS A CLICKER GAME WERE YOU CLICK A ROCKET TO KM(MONEY)
         @keyframes float { 0% { transform: translateY(0); opacity: 1; } 100% { transform: translateY(-120px); opacity: 0; } }
         
         #prestige-btn { display: none; background: var(--prestige-purple); color: white; border: none; padding: 10px; border-radius: 10px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 5px; }
-        #save-indicator { position: fixed; bottom: 10px; right: 10px; color: white; font-size: 10px; opacity: 0; transition: 0.5s; z-index: 1000; }
-
-        /* FINAL RESPONSIVE OVERRIDE */
-        @media (max-width: 768px) {
-            body { flex-direction: column; overflow-y: auto; }
-            .sidebar { width: 100%; height: auto; min-width: 100%; border-right: none; border-bottom: 5px solid var(--neon-blue); }
-            .game-area { padding: 50px 0; }
-        }
+        #save-indicator { position: absolute; bottom: 10px; right: 10px; color: white; font-size: 10px; opacity: 0; transition: opacity 0.5s; z-index: 1000; }
     </style>
 </head>
 <body>
+
+<div id="launcher">
+    <div class="launch-icon" onclick="startApp()">🚀</div>
+    <div class="launch-text">Click to Launch Fullscreen</div>
+</div>
 
 <div id="starfield"></div>
 <button id="fullscreen-btn" onclick="toggleFullscreen()">⛶ Fullscreen</button>
@@ -204,7 +216,7 @@ THIS GAME IS A CLICKER GAME WERE YOU CLICK A ROCKET TO KM(MONEY)
         <div class="ach-item"><span>Satellite Squad</span><span id="ach-2">🔒</span></div>
     </div>
 
-    <button onclick="resetGame()" style="background:none; border:none; color:red; cursor:pointer; font-size:10px; margin-top: 20px; align-self: center;">Hard Reset</button>
+    <button onclick="resetGame()" style="background:none; border:none; color:red; cursor:pointer; font-size:10px; margin-top: auto; align-self: center;">Hard Reset</button>
 </div>
 
 <div class="game-area">
@@ -232,6 +244,20 @@ THIS GAME IS A CLICKER GAME WERE YOU CLICK A ROCKET TO KM(MONEY)
         { id: 'auto3', name: 'Space Port', desc: '+1,200 km/s', cost: 120000, power: 1200, type: 'auto' }
     ];
 
+    // --- FULLSCREEN & LAUNCH LOGIC ---
+    function startApp() {
+        // Trigger Fullscreen
+        const doc = document.documentElement;
+        if (doc.requestFullscreen) doc.requestFullscreen();
+        else if (doc.webkitRequestFullscreen) doc.webkitRequestFullscreen();
+        
+        // Hide Launcher
+        document.getElementById('launcher').style.opacity = '0';
+        setTimeout(() => {
+            document.getElementById('launcher').style.display = 'none';
+        }, 500);
+    }
+
     function toggleFullscreen() {
         if (!document.fullscreenElement) document.documentElement.requestFullscreen();
         else if (document.exitFullscreen) document.exitFullscreen();
@@ -241,7 +267,8 @@ THIS GAME IS A CLICKER GAME WERE YOU CLICK A ROCKET TO KM(MONEY)
         document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
         document.getElementById(tabId).classList.add('active');
-        if(event) event.currentTarget.classList.add('active');
+        // Note: 'event' usage fixed for better browser compatibility
+        if (window.event) window.event.currentTarget.classList.add('active');
     }
 
     function saveGame() {
@@ -294,7 +321,7 @@ THIS GAME IS A CLICKER GAME WERE YOU CLICK A ROCKET TO KM(MONEY)
         if(!load) satelliteCount++;
         const sat = document.createElement('div');
         sat.className = 'satellite'; sat.innerText = emoji;
-        sat.style.setProperty('--dist', (120 + Math.random() * 40) + 'px');
+        sat.style.setProperty('--dist', (140 + Math.random() * 50) + 'px');
         sat.style.setProperty('--dur', (4 + Math.random() * 4) + 's');
         document.getElementById('rocket-holder').appendChild(sat);
     }
@@ -306,8 +333,8 @@ THIS GAME IS A CLICKER GAME WERE YOU CLICK A ROCKET TO KM(MONEY)
         
         upgrades.forEach((u, i) => {
             const el = document.getElementById(`upg-${i}`);
+            const pr = document.getElementById(`price-${i}`);
             if(el) {
-                const pr = document.getElementById(`price-${i}`);
                 pr.innerText = Math.floor(u.cost).toLocaleString();
                 score >= u.cost ? el.classList.remove('disabled') : el.classList.add('disabled');
             }
@@ -325,6 +352,7 @@ THIS GAME IS A CLICKER GAME WERE YOU CLICK A ROCKET TO KM(MONEY)
         if(confirm("Prestige? You lose km but gain permanent 2x speed!")) {
             prestigeMultiplier *= 2;
             score = 0; clickPower = 1; autoPower = 0; satelliteCount = 0;
+            upgrades.forEach(u => u.cost = u.id.includes('click1') ? 50 : u.id.includes('auto1') ? 100 : u.cost); 
             localStorage.removeItem(SAVE_KEY); location.reload();
         }
     }
@@ -339,7 +367,6 @@ THIS GAME IS A CLICKER GAME WERE YOU CLICK A ROCKET TO KM(MONEY)
 
     function changeSkin(e, c) { if(score >= c) { score -= c; currentSkin = e; document.getElementById('rocket').innerText = e; updateUI(); saveGame(); } }
     function travel(n, c) { alert(score >= c ? "Reached "+n : "Too far!"); }
-    
     function spawnText(x, y, t) {
         const div = document.createElement('div'); div.className = 'float-text';
         div.style.left = x+'px'; div.style.top = y+'px'; div.innerText = t;
@@ -347,12 +374,11 @@ THIS GAME IS A CLICKER GAME WERE YOU CLICK A ROCKET TO KM(MONEY)
     }
 
     function init() {
-        const sf = document.getElementById('starfield');
-        for(let i=0; i<100; i++) {
+        for(let i=0; i<120; i++) {
             const s = document.createElement('div'); s.className = 'star';
             s.style.width = s.style.height = Math.random()*2+'px';
             s.style.left = Math.random()*100+'%'; s.style.top = Math.random()*100+'%';
-            s.style.setProperty('--t', (2+Math.random()*3)+'s'); sf.appendChild(s);
+            s.style.setProperty('--t', (2+Math.random()*3)+'s'); document.getElementById('starfield').appendChild(s);
         }
         document.getElementById('rocket').onclick = (e) => {
             let p = clickPower * prestigeMultiplier; score += p;
@@ -360,6 +386,7 @@ THIS GAME IS A CLICKER GAME WERE YOU CLICK A ROCKET TO KM(MONEY)
         };
         loadGame();
         setInterval(() => { if(autoPower > 0) { score += (autoPower * prestigeMultiplier)/10; updateUI(); } }, 100);
+        setInterval(saveGame, 15000);
     }
 
     function resetGame() { if(confirm("Reset everything?")) { localStorage.clear(); location.reload(); } }
