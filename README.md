@@ -1,3 +1,5 @@
+#
+qwertyuiooiuytrsasrtyuiopoiuytrewertyui543ertyuicvbnmnbvdtyujnbvcdtyujhvcdrtyujnbvfrtyuydsxcvbnmjhgfdertyuytrsxcvbnjhgfdrtyuhgfvbnmmcxdftygfdsw4rdszzdfbvcdrtyhjkliuhgfdserthjkiuytfdsert
 THIS GAME IS A CLICKER GAME WERE YOU CLICK A ROCKET TO KM(MONEY)
 <!DOCTYPE html>
 <html lang="en">
